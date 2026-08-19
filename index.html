@@ -5,69 +5,93 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>小説個人サイト</title>
   <style>
-    /* 全体デザイン：軽量・シンプル */
-    body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif; max-width: 700px; margin: 0 auto; padding: 20px; background: #fdfdfd; color: #333; line-height: 1.8; }
-    header { border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
-    h1 { font-size: 1.5rem; margin: 0; }
-    .back-btn { display: inline-block; margin-bottom: 15px; color: #666; text-decoration: none; cursor: pointer; font-size: 0.9rem; }
-    .back-btn:hover { text-decoration: underline; }
+    /* 全体デザイン */
+    body { font-family: "Helvetica Neue", Arial, sans-serif; max-width: 700px; margin: 0 auto; padding: 20px; background: #fdfdfd; color: #333; line-height: 1.8; }
+    header { border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+    h1 { font-size: 1.3rem; margin: 0; }
     
-    /* 一覧ページのスタイル */
-    .novel-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px; margin-bottom: 15px; cursor: pointer; transition: transform 0.1s ease; }
-    .novel-card:hover { border-color: #0066cc; transform: translateY(-2px); }
+    /* ナビゲーションメニュー */
+    nav a { margin-left: 15px; color: #0066cc; text-decoration: none; font-weight: bold; cursor: pointer; }
+    nav a:hover { text-decoration: underline; }
+    
+    /* ボタン・カード風デザイン */
+    .btn { display: inline-block; background: #0066cc; color: #fff; padding: 10px 20px; border-radius: 5px; text-decoration: none; cursor: pointer; margin-top: 10px; }
+    .btn:hover { background: #0052a3; }
+    .back-btn { display: inline-block; margin-bottom: 15px; color: #666; text-decoration: none; cursor: pointer; font-size: 0.9rem; }
+    
+    .novel-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px; margin-bottom: 15px; cursor: pointer; }
+    .novel-card:hover { border-color: #0066cc; }
     .novel-title { font-weight: bold; font-size: 1.1rem; color: #0066cc; margin-bottom: 5px; }
     .novel-desc { font-size: 0.85rem; color: #666; margin: 0; }
     
-    /* 本文ページのスタイル（読書用に文字サイズと余白を最適化） */
+    /* 読書画面 */
     .novel-body { background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; padding: 25px; min-height: 300px; white-space: pre-wrap; font-size: 1rem; line-height: 2; }
     
-    /* 表示切り替え用 */
+    /* 表示切り替え用クラス */
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-  <!-- トップ画面（一覧） -->
-  <div id="page-list">
-    <header>
-      <h1>自作小説集</h1>
-    </header>
-    <main id="novel-container"></main>
+  <!-- 共通ヘッダー -->
+  <header>
+    <h1>サークル名 / 作者名</h1>
+    <nav>
+      <a onclick="showPage('page-home')">ホーム</a>
+      <a onclick="showPage('page-novels')">小説一覧</a>
+    </nav>
+  </header>
+
+  <!-- 1. ホームページ（トップ画面） -->
+  <div id="page-home" class="page-content">
+    <h2>Welcome</h2>
+    <p>自作小説を掲載している個人サイトです。</p>
+    <p>更新情報や作品は「小説一覧」からご覧いただけます。</p>
+    
+    <!-- 小説一覧ページへのリンクボタン -->
+    <a class="btn" onclick="showPage('page-novels')">小説を読む一覧へ →</a>
   </div>
 
-  <!-- 読書画面（初期状態は非表示） -->
-  <div id="page-reader" class="hidden">
-    <a class="back-btn" onclick="showList()">← 一覧に戻る</a>
+  <!-- 2. 小説をまとめているページ（一覧） -->
+  <div id="page-novels" class="page-content hidden">
+    <h2>小説一覧</h2>
+    <div id="novel-container"></div>
+  </div>
+
+  <!-- 3. 小説の本文を読むページ -->
+  <div id="page-reader" class="page-content hidden">
+    <a class="back-btn" onclick="showPage('page-novels')">← 小説一覧に戻る</a>
     <h2 id="reader-title" style="margin-top:0;"></h2>
     <div id="reader-body" class="novel-body"></div>
   </div>
 
   <script>
-    // ==========================================
-    // ★ ここに小説データを追加・編集していきます
-    // ==========================================
+    // 小説データ
     const novels = [
       {
         id: 1,
         title: "第一話：はじまりの街",
         desc: "主人公が旅立つ前の静かな朝の物語。",
-        content: `ここに本文を入力します。
-改行はそのまま反映されます。
-
-段落を分けるときは、このように1行あけると読みやすくなります。`
+        content: `ここに本文を入力します。\n改行はそのまま反映されます。`
       },
       {
         id: 2,
         title: "第二話：森の出会い",
         desc: "不思議な少女と出会うエピソード。",
-        content: `ここに第二話の本文を入力します。
-
-「こんにちは」
-少女はそう言って微笑んだ。`
+        content: `ここに第二話の本文を入力します。`
       }
     ];
 
-    // 一覧画面の生成
+    // 画面の表示切り替え関数
+    function showPage(pageId) {
+      // すべてのページ要素を隠す
+      document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
+      // 指定したページだけ表示
+      document.getElementById(pageId).classList.remove('hidden');
+      window.scrollTo(0, 0);
+    }
+
+    // 一覧の生成
     const container = document.getElementById('novel-container');
     novels.forEach(novel => {
       const card = document.createElement('div');
@@ -80,24 +104,15 @@
       container.appendChild(card);
     });
 
-    // 小説を読む画面へ切り替え（爆速・通信なし）
+    // 読書画面を開く
     function openNovel(id) {
       const novel = novels.find(n => n.id === id);
       if (!novel) return;
 
       document.getElementById('reader-title').textContent = novel.title;
       document.getElementById('reader-body').textContent = novel.content;
-
-      document.getElementById('page-list').classList.add('hidden');
-      document.getElementById('page-reader').classList.remove('hidden');
-      window.scrollTo(0, 0); // 画面の一番上へスクロール
-    }
-
-    // 一覧画面へ戻る
-    function showList() {
-      document.getElementById('page-reader').classList.add('hidden');
-      document.getElementById('page-list').classList.remove('hidden');
-      window.scrollTo(0, 0);
+      
+      showPage('page-reader');
     }
   </script>
 </body>
